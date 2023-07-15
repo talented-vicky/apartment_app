@@ -5,7 +5,7 @@ const { body } = require('express-validator')
 const userCtrl = require('../controllers/users')
 const Student = require('../models/student')
 
-router.get('/student/signup', [
+router.put('/student/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
             const existingUser = await Student.findOne({email: notValid})
@@ -23,7 +23,7 @@ router.get('/student/signup', [
     userCtrl.studentSignUp
 )
 
-router.get('/owner/signup', [
+router.put('/owner/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
             const existingUser = await Student.findOne({email: notValid})
