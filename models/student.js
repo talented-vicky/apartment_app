@@ -19,6 +19,8 @@ const studentSchema = new Schema(
             type: String,
             required: true,
         },
+        token: String,
+        tokenExp: Date,
         status: {
             type: String,
             default: "student"

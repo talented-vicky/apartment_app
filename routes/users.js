@@ -48,5 +48,8 @@ router.post('/student/login', userCtrl.studentLogin)
 
 router.post('/owner/login', userCtrl.ownerLogin)
 
+router.put('/student/resetpassword', userCtrl.studentReset)
+
+router.post('/student/changepassword', userCtrl.studentChangePassword)
 
 module.exports = router
