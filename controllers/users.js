@@ -7,8 +7,8 @@ const Student = require('../models/student')
 const Owner = require('../models/owner')
 
 const { json_secret } = require('../config/keys')
+const { funcSendMail } = require('../config/sendmail')
 
-const { sendMail } = require('../config/sendmail')
 
 exports.studentSignUp = async (req, res, next) => {
     const errors = validationResult(req)
@@ -50,7 +50,7 @@ exports.ownerSignUp = async (req, res, next) => {
         res.status(201).json({message: `Successfully Signed up with email: ${newOwner.email}`})
 
     } catch (error) {
-        if(!error.statusCode) err.statusCode = 500
+        if(!error.statusCode) error.statusCode = 500
         next(error)
     }
 }
@@ -111,28 +111,38 @@ exports.ownerLogin = async (req, res, next) => {
 }
 
 exports.studentReset = async (req, res, next) => {
-   try {
-        crypto.randomBytes(32, (err, buff) => {
-            if(err){
-                console.log(err)
-                return res.redirect('/reseturl')
-            }
-            const token = buff.toString('hex')
-            console.log(token)
+    let token;
+    crypto.randomBytes(32, (err, buff) => {
+        if(err){
+            const error = new Error("Problem generating encryption")
+            error.statusCode = 404
+            throw error
+        }
+        token = buff.toString('hex')
+    })
+    
+    try {
+        const student = await Student.findOne({ email: req.body.email})
+        if(!student){
+            const error = new Error("Email does not exist, please sign up!")
+            error.statusCode = 404
+            throw error
+        }
 
-            const student = await Student.findOne({ email: req.body.email})
-            if(!student){
-                const error = new Error("Email does not exist, please sign up!")
-                error.statusCode = 404
-                throw error
-            }
+        student.token = token
+        student.tokenExp = Date.now() + 900000 // expires in 15 mins
+        await student.save()
+        
+        const data = await funcSendMail(student.email, '/student/passwordForm', token)
+        // data has been undefined all these while
+        console.log(data)
+        if(!data){
+            const error = new Email("Error sending email")
+            error.statusCode = 402
+            throw error
+        }
+        res.status(200).json({message: "Successfully sent email", result: data})
 
-            student.token = token
-            student.tokenExp = Data.now() + 900000 // expires in 15 mins
-            await student.save()
-
-            sendMail(student.email, '/student/passwordForm', token)
-        })
     } catch (error) {
         next(error)
     }

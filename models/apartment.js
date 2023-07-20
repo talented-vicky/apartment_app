@@ -6,14 +6,40 @@ const apartmentSchema = new Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String, 
+        required: true
+    },
+    image: {
+        type: String,
+        required: true
+    },
     location: {
         type: String,
         required: true,
     },
-    type: {
+    categories: {
         type: String,
         required: true
     },
+    rooms: {
+        type: Number,
+        required: true
+    },
+    lowestPrice: {
+        type: String,
+        required: true
+    },
+    highestPrice: {
+        type: String,
+        required: true
+    },
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ],
     owner: {
         type: Schema.Types.ObjectId,
         ref: 'Owner',

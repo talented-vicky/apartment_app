@@ -4,6 +4,7 @@ const { body } = require('express-validator')
 
 const userCtrl = require('../controllers/users')
 const Student = require('../models/student')
+const Owner = require('../models/owner')
 
 router.put('/student/signup', [
     body('email').isEmail().withMessage('Invalid email')
@@ -26,7 +27,7 @@ router.put('/student/signup', [
 router.put('/owner/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
-            const existingUser = await Student.findOne({email: notValid})
+            const existingUser = await Owner.findOne({email: notValid})
             if(existingUser){
                 return Promise.reject("An owner with email already exists")
             }
@@ -48,7 +49,7 @@ router.post('/student/login', userCtrl.studentLogin)
 
 router.post('/owner/login', userCtrl.ownerLogin)
 
-router.put('/student/resetpassword', userCtrl.studentReset)
+router.post('/student/resetpassword', userCtrl.studentReset)
 
 router.post('/student/changepassword', userCtrl.studentChangePassword)
 

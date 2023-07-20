@@ -1,9 +1,9 @@
 const sgMail = require('@sendgrid/mail')
+
 const { sendgrid_api_key } = require('./keys')
 
-sgMail.setApiKey(sendgrid_api_key)
-
-const sendMail = async (userEmail, url, token) => {
+const funcSendMail = async (userEmail, url, token) => {
+    sgMail.setApiKey(sendgrid_api_key)
     const msg = {
         to: userEmail,
         from: 'victorotubure7@gmail.com',
@@ -17,15 +17,14 @@ const sendMail = async (userEmail, url, token) => {
         // frontend should display a page with this info
         // this link should be what displays the form to enter
         // new password credentials
-    },
+    };
     
-    const sendMail = await sgMail.send(msg)
-    if(!sendMail) {
+    const result = await sgMail.send(msg)
+    if(!result) {
         const error = new Error("unable to send mail")
         error.statusCode = 550
         throw error
-    }
-    res.status(200).json({message: "Sent code successfully"})
+    };
 }
 
-module.exports = { sendMail }
+module.exports = { funcSendMail }
