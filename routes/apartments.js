@@ -1,34 +1,45 @@
 const express = require('express')
+const router = express.Router()
 const { body } = require('express-validator')
 
-const router = express.Router()
 const apartCtrl = require('../controllers/apartments')
 
 const authMid = require('../middlewares/auth')
 
 // APARTMENTS
-router.get('/owner/apartments', apartCtrl.fetchApartments)
+router.get('/owner/apartments', authMid, apartCtrl.fetchApartments)
 
-router.get('/owner/apartment/:apartId', apartCtrl.fetchApartment)
+router.get('/owner/apartment/:apartId', authMid, apartCtrl.fetchApartment)
 
-router.put('/owner/apartment', [
+router.post('/owner/apartment', [
     body('name').not().isEmpty()
         .withMessage("Name cannot be blank"),
     body('description').not().isEmpty()
-        .withMessage("Description cannot be empty")
+        .withMessage("Description cannot be empty"),
+    body('rooms').isNumeric()
+        .withMessage('rooms field must be numeric'),
+    body('lowestPrice').isNumeric()
+        .withMessage('price must be numeric'),
+    body('highestPrice').isNumeric()
+        .withMessage('price must be numeric'),
 ], authMid, apartCtrl.createApartment)
 
 router.post('/owner/apartment/:apartId', [
     body('name').not().isEmpty()
         .withMessage("Name cannot be blank"),
     body('description').not().isEmpty()
-        .withMessage("Description cannot be empty")
+        .withMessage("Description cannot be empty"),
+        body('rooms').isNumeric()
+        .withMessage('rooms field must be numeric'),
+    body('lowestPrice').isNumeric()
+        .withMessage('price must be numeric'),
+    body('highestPrice').isNumeric()
+        .withMessage('price must be numeric'),
 ], authMid, apartCtrl.updateApartment)
 
 router.delete('/owner/apartment/:apartId', authMid, apartCtrl.deleteApartment)
 
-// remove authentication middleware when testing with postman
-// naaaaaah, add authorization in postman when testing
+
 
 // COMMENTS
 router.get('/apartment/comments', apartCtrl.fetchComments)
@@ -42,7 +53,9 @@ router.put('/apartment/comment/:apartId', [
 
 router.post('/apartment/comment/:commentId', [
     body('content').not().isEmpty()
-        .withMessage("Content cannnot be blank")
+        .withMessage("Comment cannnot be blank")
 ], apartCtrl.editComment)
 
 router.delete('/apartment/comment/:commentId', apartCtrl.removeComment)
+
+module.exports = router

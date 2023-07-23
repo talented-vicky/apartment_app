@@ -7,8 +7,8 @@ const fileStorage = multer.diskStorage({
         // check two code lines
     },
     filename: (req, file, callback) => {
-        const pre = `${Data.now()} - ${Math.round(Math.random() * 1E9)}`
-        callback(null, `${pre} - ${file.originalname}`)
+        const pre = `${Date.now()}-${Math.round(Math.random() * 1E9)}`
+        callback(null, `${pre}-${file.originalname}`)
     }
 })
 

@@ -11,7 +11,7 @@ router.put('/student/signup', [
         .custom(async (notValid, { req }) => {
             const existingUser = await Student.findOne({email: notValid})
             if(existingUser){
-                return Promise.reject("A student with email already exists")
+                return Promise.reject("A student with this email already exists")
             }
         }).normalizeEmail(),
     body('password').trim().isLength({min: 9})
@@ -29,7 +29,7 @@ router.put('/owner/signup', [
         .custom(async (notValid, { req }) => {
             const existingUser = await Owner.findOne({email: notValid})
             if(existingUser){
-                return Promise.reject("An owner with email already exists")
+                return Promise.reject("An owner with this email already exists")
             }
         }).normalizeEmail(),
     body('password').trim().isLength({min: 9})

@@ -45,3 +45,11 @@ app.use((err, req, res, next) => {
 
 connectDB()
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
+
+// confirm frontend set headers to allow for json data
+// frontend should have token and userId in the setstate upon
+// user login
+
+// headers: {
+//     Authorization: 'Bearer ' + this.props.token
+// }

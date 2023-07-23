@@ -9,16 +9,26 @@ const Owner = require('../models/owner')
 const { json_secret } = require('../config/keys')
 const { funcSendMail } = require('../config/sendmail')
 
-
-exports.studentSignUp = async (req, res, next) => {
-    const errors = validationResult(req)
-    console.log(errors)
+const validationFunc = (request) => {
+    const errors = validationResult(request)
     if(!errors.isEmpty()){
-        const error = new Error('validation failed')
+        const error = new Error("Validation Failed")
         error.statusCode = 422
         error.data = errors.array()[0]
         throw error
     }
+}
+
+const userDetailsFunc = (userParam, errMsg) => {
+    if(!userParam){
+        const error = new Error(errMsg)
+        error.statusCode = 401
+        throw error
+    }
+}
+
+exports.studentSignUp = async (req, res, next) => {
+    validationFunc(req)
     
     const { firstname, lastname, email, password } = req.body
     try {
@@ -34,13 +44,7 @@ exports.studentSignUp = async (req, res, next) => {
 }
 
 exports.ownerSignUp = async (req, res, next) => {
-    const errors = validationResult(req)
-    if(!errors.isEmpty()){
-        const error = new Error('validation failed')
-        error.statusCode = 422
-        error.data = errors.array()[0]
-        throw error
-    }
+    validationFunc(req)
     
     const { firstname, lastname, address, email, password } = req.body
     try {
@@ -60,18 +64,10 @@ exports.studentLogin = async (req, res, next) => {
 
     try {
         const oldStudent = await Student.findOne({ email })
-        if(!oldStudent){
-            const error = new Error("Email does not exist in database, Please sign up!")
-            error.statusCode = 401
-            throw error
-        }
+        userDetailsFunc(oldStudent, "Email does not exist in database, Please sign up!")
 
         const okPassword = await bcrypt.compare(password, oldStudent.password)
-        if(!okPassword){
-            const error = new Error("Incorrect password")
-            error.statusCode = 401
-            throw error
-        }
+        userDetailsFunc(okPassword, "Incorrect Password")
 
         const token = jwt.sign(
             {email: oldStudent.email, studentId: oldStudent._id.toString()},
@@ -88,19 +84,11 @@ exports.ownerLogin = async (req, res, next) => {
 
     try {
         const oldOwner = await Owner.findOne({ email })
-        if(!oldOwner){
-            const error = new Error("Email does not exist, please sign up!")
-            error.statusCode = 401
-            throw error
-        }
-
+        userDetailsFunc(oldOwner, "Email does not exist, please sign up!")
+        
         const okPassword = await bcrypt.compare(password, oldOwner.password)
-        if(!okPassword){
-            const error = new Error("Incorrect password")
-            error.statusCode = 401
-            throw error
-        }
-
+        userDetailsFunc(okPassword, "Incorrect Passowrd")
+        
         const token = jwt.sign(
             {email: oldOwner.email, ownerId: oldOwner._id.toString()},
             json_secret, {expiresIn: '.25h'})

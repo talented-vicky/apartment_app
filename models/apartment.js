@@ -27,11 +27,11 @@ const apartmentSchema = new Schema({
         required: true
     },
     lowestPrice: {
-        type: String,
+        type: Number,
         required: true
     },
     highestPrice: {
-        type: String,
+        type: Number,
         required: true
     },
     comments: [
