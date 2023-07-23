@@ -2,6 +2,9 @@ const express = require('express')
 const bodyparser = require('body-parser')
 const multer = require("multer")
 const path = require('path')
+const passport = require('passport')
+const ckSession = require('cookie-session')
+require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
@@ -12,6 +15,14 @@ const { logger } = require('./config/logger')
 const { fileStorage, filter } = require('./config/file')
 
 const app = express()
+
+app.use(ckSession({
+    name: 'google-auth-session',
+    keys: ['key1', 'key2']
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(bodyparser.json())
 // helps server understand all client json data
@@ -30,6 +41,10 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     next()
 })
+
+// app.get('/', (req, res) => {
+//     res.send("<button><a href='/auth/google'>Login with ggl</a></button>")
+// })
 
 app.use(userRoute)
 app.use(apartmentRoute)

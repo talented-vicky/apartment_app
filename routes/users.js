@@ -6,6 +6,8 @@ const userCtrl = require('../controllers/users')
 const Student = require('../models/student')
 const Owner = require('../models/owner')
 
+
+// USERS LOGIN & SIGNUP
 router.put('/student/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
@@ -52,5 +54,19 @@ router.post('/owner/login', userCtrl.ownerLogin)
 router.post('/student/resetpassword', userCtrl.studentReset)
 
 router.post('/student/changepassword', userCtrl.studentChangePassword)
+
+
+
+// GOOGLE LOGIN
+router.get('/auth/google', userCtrl.gglConsentScreen)
+
+router.get('/auth/google/callback', 
+    userCtrl.gglCallback, userCtrl.jsnWebToken)
+
+router.get('/auth/google/success', 
+    userCtrl.jsnValidteToken, userCtrl.onSuccess)
+
+router.get('/auth/google/failure', userCtrl.onFailure)
+
 
 module.exports = router

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const { validationResult } = require('express-validator')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+const passport = require('passport')
 
 const Student = require('../models/student')
 const Owner = require('../models/owner')
@@ -27,6 +28,8 @@ const userDetailsFunc = (userParam, errMsg) => {
     }
 }
 
+
+// USERS SIGNUP & LOGIN
 exports.studentSignUp = async (req, res, next) => {
     validationFunc(req)
     
@@ -161,9 +164,44 @@ exports.studentChangePassword = async (req, res, next) => {
         student.tokenExp = undefined
         const newStudent = await student.save()
         res.status(200).json({message: `Successfully reset password for user with id: ${newStudent._id}`})
-        // redirect to login page
 
     } catch (error) {
         next(error)
     }
+}
+
+
+
+// GOOGLE LOGIN
+exports.gglConsentScreen = passport.authenticate(
+    'google', { scope: ['email', 'profile'] }
+);
+
+exports.gglCallback = passport.authenticate(
+    'google', { session: false, successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'});
+
+exports.jsnWebToken = (req, res) => {
+    jwt.sign(
+        {user: req.user}, json_secret, {expiresIn: '.25'},
+        (err, token) => {
+            if(err){
+                return res.status(500).json({token: null})
+            }
+            res.status(200).json({token, userId: req.user})
+        })
+};
+
+exports.jsnValidteToken = passport.authenticate(
+    'jwt', { session: false});
+
+exports.onSuccess = (req, res) => {
+    console.log("You are now logged in")
+    res.status(200).json({message: "Successfully signed in"})
+}
+
+exports.onFailure = (req, res) => {
+    console.log("Login in Failed")
+    res.status(500).json({message: "Error login in"})
+    // res.send("Error login in")
 }

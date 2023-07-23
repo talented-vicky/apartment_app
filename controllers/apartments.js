@@ -192,8 +192,8 @@ exports.editComment = async (req, res, next) => {
 exports.removeComment = async (req, res, next) => {
     const commentID = req.params.commentId
     try {
-        const comment = await Comment.findById("64bcff2be03fc8e42ee0bc68")
-        // const comment = await Comment.findById(commentID)
+        // const comment = await Comment.findById("64bcff2be03fc8e42ee0bc68")
+        const comment = await Comment.findById(commentID)
         console.log(comment)
         notInDB(comment, "Comment")
         
