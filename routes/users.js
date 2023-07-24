@@ -7,6 +7,16 @@ const Student = require('../models/student')
 const Owner = require('../models/owner')
 
 
+// USERS DETAILS
+router.get('/students', userCtrl.getStudents)
+
+router.get('/student/:studentId', userCtrl.getStudent)
+
+router.get('/owners', userCtrl.getOwners)
+
+router.get('/owner/:ownerId', userCtrl.getOwner)
+
+
 // USERS LOGIN & SIGNUP
 router.put('/student/signup', [
     body('email').isEmail().withMessage('Invalid email')
@@ -45,7 +55,6 @@ router.put('/owner/signup', [
 ],
     userCtrl.ownerSignUp
 )
-
 
 router.post('/student/login', userCtrl.studentLogin)
 

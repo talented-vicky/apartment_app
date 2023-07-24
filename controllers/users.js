@@ -28,6 +28,52 @@ const userDetailsFunc = (userParam, errMsg) => {
     }
 }
 
+// USERS DETAILS
+exports.getStudents = async (req, res, next) => {
+    try {
+        const students = await Student.find()
+        userDetailsFunc(students, "Students Not Found")
+        res.status(200).json({message: "Successfully Fetched Students", data: students})
+    } catch (error) {
+        next(error)
+    }
+
+}
+
+exports.getStudent = async (req, res, next) => {
+    try {
+        const student = await Student.findById(req.params.studentId)
+        // const student = await Student.findById("64b468dd331074d7216b2550")
+        userDetailsFunc(student, "Student Not Found")
+        res.status(200).json({message: "Successfully Fetched Student", data: student})
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getOwners = async (req, res, next) => {
+    try {
+        const owners = await Owner.find()
+        userDetailsFunc(owners, "Owners Not Found")
+
+        res.status(200).json({message: "Successfully Fetched Owners", data: owners})
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getOwner = async (req, res, next) => {
+    try {
+        // const owner = await Owner.findById(req.params.ownerId)
+        const owner = await Owner.findById("64bbdb2d96a757dcc75e80f4")
+        userDetailsFunc(owner, "Owner Not Found")
+
+        res.status(200).json({message: "Successfylly Fetched Owner", data: owner})
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 // USERS SIGNUP & LOGIN
 exports.studentSignUp = async (req, res, next) => {

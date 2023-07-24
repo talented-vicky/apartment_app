@@ -5,7 +5,7 @@ const { ExtractJwt } = require('passport-jwt')
 
 const { client_id, client_secret, redirect_url, json_secret} = require('./keys')
 const Student = require('../models/student')
-
+const Owner = require('../models/owner')
 
 passport.serializeUser((user, done) => {
     done(null, user)
@@ -28,8 +28,12 @@ passport.use(
     async (request, accessToken, refreshToken, profile, done) => {
         try {
             let oldStudent = await Student.findOne({ 'google.id': profile.id })
+            let oldOwner = await Owner.findOne({ 'google.id': profile.id })
             if(oldStudent){
                 return done(null, oldStudent)
+            }
+            if(oldOwner){
+                return done(null, oldOwner)
             }
             const newStudent = new Student({
                 method: 'google',
@@ -39,6 +43,7 @@ passport.use(
                     name: profile.displayName
                 }
             })
+            // find fix to allow new owners sign up with google
             await newStudent.save()
             return done(null, profile)
         } catch (error) {

@@ -3,6 +3,17 @@ const Schema = mongoose.Schema
 
 const ownerSchema = new Schema(
     {
+        google: {
+            id: {
+                type: String
+            },
+            email: {
+                type: String
+            },
+            name: {
+                type: String
+            },
+        },
         firstname: {
             type: String,
             required: true,
