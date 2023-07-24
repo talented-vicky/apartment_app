@@ -133,7 +133,7 @@ exports.userLogin = async (req, res, next) => {
   if (!user_type) {
     userDetailsFunc(
       user_type,
-      "User type was not provided, please provide a user type"
+      "User type was not provided, please provide a valid user type"
     );
   }
   const modelToUse = () => {
