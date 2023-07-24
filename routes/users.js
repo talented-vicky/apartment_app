@@ -56,6 +56,8 @@ router.put('/owner/signup', [
     userCtrl.ownerSignUp
 )
 
+router.post('/login', userCtrl.userLogin)
+
 router.post('/student/login', userCtrl.studentLogin)
 
 router.post('/owner/login', userCtrl.ownerLogin)
