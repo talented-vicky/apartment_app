@@ -3,27 +3,22 @@ const router = express.Router()
 const { body } = require('express-validator')
 
 const userCtrl = require('../controllers/users')
-const Student = require('../models/student')
-const Owner = require('../models/owner')
+const User = require('../models/user')
 
 
 // USERS DETAILS
-router.get('/students', userCtrl.getStudents)
+router.get('/users', userCtrl.getUsers)
 
-router.get('/student/:studentId', userCtrl.getStudent)
-
-router.get('/owners', userCtrl.getOwners)
-
-router.get('/owner/:ownerId', userCtrl.getOwner)
+router.get('/user/:userId', userCtrl.getUser)
 
 
-// USERS LOGIN & SIGNUP
-router.put('/student/signup', [
+// USERS SIGNUP & LOGIN
+router.put('/user/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
-            const existingUser = await Student.findOne({email: notValid})
+            const existingUser = await User.findOne({email: notValid})
             if(existingUser){
-                return Promise.reject("A student with this email already exists")
+                return Promise.reject("A user with this email already exists")
             }
         }).normalizeEmail(),
     body('password').trim().isLength({min: 9})
@@ -33,36 +28,15 @@ router.put('/student/signup', [
     body('lastname').trim().not().isEmpty()
         .withMessage("lastname cannnot be blank"),
 ],
-    userCtrl.studentSignUp
+    userCtrl.userSignUp
 )
 
-router.put('/owner/signup', [
-    body('email').isEmail().withMessage('Invalid email')
-        .custom(async (notValid, { req }) => {
-            const existingUser = await Owner.findOne({email: notValid})
-            if(existingUser){
-                return Promise.reject("An owner with this email already exists")
-            }
-        }).normalizeEmail(),
-    body('password').trim().isLength({min: 9})
-        .withMessage("Password should be at least 9 characters"),
-    body('address').trim().isLength({min: 12})
-        .withMessage("Address should be at least 12 characters"),
-    body('firstname').trim().not().isEmpty()
-        .withMessage("firstname cannnot be blank"),
-    body('lastname').trim().not().isEmpty()
-        .withMessage("lastname cannnot be blank"),
-],
-    userCtrl.ownerSignUp
-)
 
-router.post('/student/login', userCtrl.studentLogin)
+router.post('/user/login', userCtrl.userLogin)
 
-router.post('/owner/login', userCtrl.ownerLogin)
+router.post('/user/resetpassword', userCtrl.userReset)
 
-router.post('/student/resetpassword', userCtrl.studentReset)
-
-router.post('/student/changepassword', userCtrl.studentChangePassword)
+router.post('/user/changepassword', userCtrl.userChangePassword)
 
 
 

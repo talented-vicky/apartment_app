@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const studentSchema = new Schema(
+const userSchema = new Schema(
     {
         google: {
             id: {
@@ -30,11 +30,14 @@ const studentSchema = new Schema(
             type: String,
             required: true,
         },
+        address: {
+            type: String
+        },
         token: String,
         tokenExp: Date,
         status: {
             type: String,
-            default: "student"
+            required: true
         }
     },
     {
@@ -42,4 +45,4 @@ const studentSchema = new Schema(
     }
 )
 
-module.exports = mongoose.model('Student', studentSchema)
+module.exports = mongoose.model('User', userSchema)

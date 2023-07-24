@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const passport = require('passport')
 
-const Student = require('../models/student')
-const Owner = require('../models/owner')
+const User = require('../models/user')
 
 const { json_secret } = require('../config/keys')
 const { funcSendMail } = require('../config/sendmail')
@@ -29,62 +28,41 @@ const userDetailsFunc = (userParam, errMsg) => {
 }
 
 // USERS DETAILS
-exports.getStudents = async (req, res, next) => {
+exports.getUsers = async (req, res, next) => {
     try {
-        const students = await Student.find()
-        userDetailsFunc(students, "Students Not Found")
-        res.status(200).json({message: "Successfully Fetched Students", data: students})
+        const users = await User.find()
+        userDetailsFunc(users, "Users Not Found")
+        res.status(200).json({message: "Successfully Fetched Users", data: users})
     } catch (error) {
         next(error)
     }
 
 }
 
-exports.getStudent = async (req, res, next) => {
+exports.getUser = async (req, res, next) => {
     try {
-        const student = await Student.findById(req.params.studentId)
-        // const student = await Student.findById("64b468dd331074d7216b2550")
-        userDetailsFunc(student, "Student Not Found")
-        res.status(200).json({message: "Successfully Fetched Student", data: student})
+        // const user = await User.findById(req.params.userId)
+        const user = await User.findById("64bee4a8a59769b0633fd6c4")
+        userDetailsFunc(user, "User Not Found")
+        res.status(200).json({message: "Successfully Fetched User", data: user})
     } catch (error) {
         next(error)
     }
 }
 
-exports.getOwners = async (req, res, next) => {
-    try {
-        const owners = await Owner.find()
-        userDetailsFunc(owners, "Owners Not Found")
 
-        res.status(200).json({message: "Successfully Fetched Owners", data: owners})
-    } catch (error) {
-        next(error)
-    }
-}
-
-exports.getOwner = async (req, res, next) => {
-    try {
-        // const owner = await Owner.findById(req.params.ownerId)
-        const owner = await Owner.findById("64bbdb2d96a757dcc75e80f4")
-        userDetailsFunc(owner, "Owner Not Found")
-
-        res.status(200).json({message: "Successfylly Fetched Owner", data: owner})
-    } catch (error) {
-        next(error)
-    }
-}
 
 
 // USERS SIGNUP & LOGIN
-exports.studentSignUp = async (req, res, next) => {
+exports.userSignUp = async (req, res, next) => {
     validationFunc(req)
     
-    const { firstname, lastname, email, password } = req.body
+    const { firstname, lastname, email, password, status } = req.body
     try {
         const hashpassword = await bcrypt.hash(password, 12)
-        const student = new Student({ firstname, lastname, email, password: hashpassword })
-        const newStudent = await student.save()
-        res.status(201).json({message: `Successfully Signed up with email: ${newStudent.email}`})
+        const user = new User({ firstname, lastname, email, password: hashpassword, status })
+        const newUser = await user.save()
+        res.status(201).json({message: `Successfully Signed up with email: ${newUser.email}`})
 
     } catch (error) {
         if(!error.statusCode) error.statusCode = 500
@@ -92,62 +70,28 @@ exports.studentSignUp = async (req, res, next) => {
     }
 }
 
-exports.ownerSignUp = async (req, res, next) => {
-    validationFunc(req)
-    
-    const { firstname, lastname, address, email, password } = req.body
-    try {
-        const hashPassword = await bcrypt.hash(password, 12)
-        const owner = new Owner({ firstname, lastname, address, email, password: hashPassword })
-        const newOwner = await owner.save()
-        res.status(201).json({message: `Successfully Signed up with email: ${newOwner.email}`})
-
-    } catch (error) {
-        if(!error.statusCode) error.statusCode = 500
-        next(error)
-    }
-}
-
-exports.studentLogin = async (req, res, next) => {
+exports.userLogin = async (req, res, next) => {
     const { email, password } = req.body
 
     try {
-        const oldStudent = await Student.findOne({ email })
-        userDetailsFunc(oldStudent, "Email does not exist in database, Please sign up!")
+        const oldUser = await User.findOne({ email })
+        userDetailsFunc(oldUser, "Email does not exist in database, Please sign up!")
 
-        const okPassword = await bcrypt.compare(password, oldStudent.password)
+        const okPassword = await bcrypt.compare(password, oldUser.password)
         userDetailsFunc(okPassword, "Incorrect Password")
 
         const token = jwt.sign(
-            {email: oldStudent.email, studentId: oldStudent._id.toString()},
+            {email: oldUser.email, userId: oldUser._id.toString()},
             json_secret, {expiresIn: '.25h'}) // signed in for 15 mins
-        res.status(200).json({token: token, studentId: oldStudent._id.toString()})
+        res.status(200).json({token: token, userId: oldUser._id.toString()})
 
     } catch (error) {
         next(error)
     }
 }
 
-exports.ownerLogin = async (req, res, next) => {
-    const { email, password } = req.body
 
-    try {
-        const oldOwner = await Owner.findOne({ email })
-        userDetailsFunc(oldOwner, "Email does not exist, please sign up!")
-        
-        const okPassword = await bcrypt.compare(password, oldOwner.password)
-        userDetailsFunc(okPassword, "Incorrect Passowrd")
-        
-        const token = jwt.sign(
-            {email: oldOwner.email, ownerId: oldOwner._id.toString()},
-            json_secret, {expiresIn: '.25h'})
-        res.status(200).json({token: token, ownerId: oldOwner._id.toString()})
-    } catch (error) {
-        next(error)
-    }
-}
-
-exports.studentReset = async (req, res, next) => {
+exports.userReset = async (req, res, next) => {
     let token;
     crypto.randomBytes(32, (err, buff) => {
         if(err){
@@ -159,18 +103,18 @@ exports.studentReset = async (req, res, next) => {
     })
     
     try {
-        const student = await Student.findOne({ email: req.body.email})
-        if(!student){
+        const user = await User.findOne({ email: req.body.email})
+        if(!user){
             const error = new Error("Email does not exist, please sign up!")
             error.statusCode = 404
             throw error
         }
 
-        student.token = token
-        student.tokenExp = Date.now() + 900000 // expires in 15 mins
-        await student.save()
+        user.token = token
+        user.tokenExp = Date.now() + 900000 // expires in 15 mins
+        await user.save()
         
-        const data = await funcSendMail(student.email, '/student/passwordForm', token)
+        const data = await funcSendMail(user.email, '/user/passwordForm', token)
         // data has been undefined all these while
         console.log(data)
         if(!data){
@@ -185,7 +129,7 @@ exports.studentReset = async (req, res, next) => {
     }
 }
 
-exports.studentChangePassword = async (req, res, next) => {
+exports.userChangePassword = async (req, res, next) => {
     const { token, password, passwordConfirm } = req.body
     // inform frontend to add a hidden input field that fetches
     // the token from the url that brought the user to the 
@@ -198,18 +142,18 @@ exports.studentChangePassword = async (req, res, next) => {
     }
 
     try {
-        const student = await Student.findOne({ token, tokenExp: {$gt: Data.now()} })
-        if(!student){
+        const user = await User.findOne({ token, tokenExp: {$gt: Data.now()} })
+        if(!user){
             const error = new Error("Invalid token OR token already expired, note that token expiration date is 15 mins")
             error.statusCode = 403
             throw error
         }
         const hashPassword = await bcrypt.hash(password, 12)
-        student.password = hashPassword
-        student.token = undefined
-        student.tokenExp = undefined
-        const newStudent = await student.save()
-        res.status(200).json({message: `Successfully reset password for user with id: ${newStudent._id}`})
+        user.password = hashPassword
+        user.token = undefined
+        user.tokenExp = undefined
+        const newUser = await user.save()
+        res.status(200).json({message: `Successfully reset password for user with id: ${newUser._id}`})
 
     } catch (error) {
         next(error)

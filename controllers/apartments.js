@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator')
 
 const Apartment = require('../models/apartment')
-const Owner = require('../models/owner')
+const User = require('../models/user')
 const Comment = require('../models/comment')
 
 const validateFunc = (request) => {
@@ -56,12 +56,12 @@ exports.createApartment = async (req, res, next) => {
     const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice })
     
     try {
-        const owner = await Owner.findById(req.userId)
-        // const owner = await Owner.findById("64bbdb2d96a757dcc75e80f4")
-        apartment.owner = owner._id
-        owner.apartments.push(apartment)
+        const user = await User.findById(req.userId)
+        // const user = await User.findById("64bbdb2d96a757dcc75e80f4")
+        apartment.user = user._id
+        user.apartments.push(apartment)
 
-        await owner.save()
+        await user.save()
         await apartment.save()
 
         res.status(201).json({ message: "Successfully Added Apartment", data: apartment })
@@ -113,9 +113,9 @@ exports.deleteApartment = async (req, res, next) => {
         await Apartment.findByIdAndRemove(apartID)
         await apart.save()
 
-        const owner = await Owner.findById(req.userId)
-        owner.apartments.pull(apartID)
-        await owner.save()
+        const user = await User.findById(req.userId)
+        user.apartments.pull(apartID)
+        await user.save()
         res.status(200).json({message: "Successfully Deleted Apartment"})
 
     } catch (error) {

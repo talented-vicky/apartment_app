@@ -8,6 +8,7 @@ require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
+const chatRoute = require('./routes/chat')
 
 const { PORT } = require('./config/keys')
 const { connectDB } = require('./config/db')
@@ -48,6 +49,7 @@ app.use((req, res, next) => {
 
 app.use(userRoute)
 app.use(apartmentRoute)
+app.use(chatRoute)
 
 // errors from the above middlewares (see all catch in controllers) 
 // are sent to the middleware below (error middleware)

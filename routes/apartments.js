@@ -3,8 +3,8 @@ const router = express.Router()
 const { body } = require('express-validator')
 
 const apartCtrl = require('../controllers/apartments')
-
 const authMid = require('../middlewares/auth')
+
 
 // APARTMENTS
 router.get('/owner/apartments', authMid, apartCtrl.fetchApartments)
