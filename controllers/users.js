@@ -11,6 +11,7 @@ const { funcSendMail } = require('../config/sendmail')
 
 const validationFunc = (request) => {
     const errors = validationResult(request)
+    console.log(errors)
     if(!errors.isEmpty()){
         const error = new Error("Validation Failed")
         error.statusCode = 422
@@ -27,11 +28,21 @@ const userDetailsFunc = (userParam, errMsg) => {
     }
 }
 
+const emptyUserData = (userdata, errMsg) => {
+    if(userdata.length == 0){
+        return res.status(200).json({
+            message: `No ${userdata} found`,
+            data: userdata
+        })
+    }
+}
+
 // USERS DETAILS
 exports.getUsers = async (req, res, next) => {
     try {
         const users = await User.find()
         userDetailsFunc(users, "Users Not Found")
+        emptyUserData(users, "Users Not Found")
         res.status(200).json({message: "Successfully Fetched Users", data: users})
     } catch (error) {
         next(error)

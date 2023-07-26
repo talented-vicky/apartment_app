@@ -1,6 +1,14 @@
-exports.getChat = (req, res, next) => {
+const Chat = require('../models/chat')
+const { connectDB } = require('../config/db')
+
+exports.getChat = async (req, res, next) => {
     res.setHeader("Content-Type", "application/json")
     res.statusCode = 200
+
+    // now connect to database and AFTERWARDS
+    connectDB()
+    const chat = await Chat.find()
+    res.status(200).json(chat)
 
 }
 

@@ -8,12 +8,13 @@ require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
-const chatRoute = require('./routes/chat')
+// const chatRoute = require('./routes/chat')
 
 const { PORT } = require('./config/keys')
 const { connectDB } = require('./config/db')
 const { logger } = require('./config/logger')
 const { fileStorage, filter } = require('./config/file')
+// const { socketIO } = require('./config/socket')
 
 const app = express()
 
@@ -44,12 +45,12 @@ app.use((req, res, next) => {
 })
 
 // app.get('/', (req, res) => {
-//     res.send("<button><a href='/auth/google'>Login with ggl</a></button>")
+//     res.status(200).json({message: "Welcome to the backend"})
 // })
 
 app.use(userRoute)
 app.use(apartmentRoute)
-app.use(chatRoute)
+// app.use(chatRoute)
 
 // errors from the above middlewares (see all catch in controllers) 
 // are sent to the middleware below (error middleware)
@@ -60,12 +61,10 @@ app.use((err, req, res, next) => {
     res.status(status).json({message: msg, data: data})
 })
 
+
 connectDB()
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
 
-// confirm frontend set headers to allow for json data
-// frontend should have token and userId in the setstate upon
-// user login
 
 // headers: {
 //     Authorization: 'Bearer ' + this.props.token

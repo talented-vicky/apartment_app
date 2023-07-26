@@ -14,10 +14,19 @@ const validateFunc = (request) => {
 }
 
 const notInDB = (constant, name) => {
-    if(!constant || constant.length == 0){
+    if(!constant){
         const error = new Error(`${name} Not Found`)
         error.statusCode = 401
         throw error
+    }
+}
+
+const emptyData = (data, constant) => {
+    if(data.length == 0){
+        return res.status(200).json({
+            message: `No ${constant} found`,
+            data: data
+        })
     }
 }
 
@@ -25,6 +34,7 @@ exports.fetchApartments = async (req, res, next) => {
     try {
         const aparts = await Apartment.find()
         notInDB(aparts, "Apartments")
+        emptyData(aparts, "Apartments")
         res.status(200).json({message: "Successfully Fetched Apartments", data: aparts})
         
     } catch (error) {
@@ -57,7 +67,7 @@ exports.createApartment = async (req, res, next) => {
     
     try {
         const user = await User.findById(req.userId)
-        // const user = await User.findById("64bbdb2d96a757dcc75e80f4")
+        // const user = await User.findById("64bee4a8a59769b0633fd6c4")
         apartment.user = user._id
         user.apartments.push(apartment)
 
@@ -130,7 +140,7 @@ exports.fetchComments = async (req, res, next) => {
     try {
         const comment = await Comment.find()
         notInDB(comment, "Comments")
-        //
+        emptyData(comment, "Comments")
         res.status(200).json({message: "Successfully Fetched Comments", data: comment})
     
     } catch (error) {
@@ -194,7 +204,6 @@ exports.removeComment = async (req, res, next) => {
     try {
         // const comment = await Comment.findById("64bcff2be03fc8e42ee0bc68")
         const comment = await Comment.findById(commentID)
-        console.log(comment)
         notInDB(comment, "Comment")
         
         await Comment.findByIdAndRemove(commentID)

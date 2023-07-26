@@ -38,7 +38,13 @@ const userSchema = new Schema(
         status: {
             type: String,
             required: true
-        }
+        },
+        apartments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Apartment'
+            }
+        ]
     },
     {
         timestamps: true
