@@ -58,4 +58,14 @@ router.post('/apartment/comment/:commentId', [
 
 router.delete('/apartment/comment/:commentId', apartCtrl.removeComment)
 
+
+
+// LIKES
+router.get('/comment/like/:commentId', apartCtrl.likeComment)
+
+router.get('/comment/unilike:commentId', apartCtrl.unlikeComment)
+
+
+
+
 module.exports = router

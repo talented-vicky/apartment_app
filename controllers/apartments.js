@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator')
 const Apartment = require('../models/apartment')
 const User = require('../models/user')
 const Comment = require('../models/comment')
+const Like = require('../models/like')
 
 const validateFunc = (request) => {
     const errors = validationResult(request)
@@ -208,6 +209,50 @@ exports.removeComment = async (req, res, next) => {
         
         await Comment.findByIdAndRemove(commentID)
         res.status(200).json({message: "Successfully Deleted Comment"})
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.likeComment = async (req, res, next) => {
+    const commentID = req.params.commentId;
+    try {
+        const comment = await Comment.findById(commentID)
+        notInDB(comment, "Comment")
+    
+        // ensuring users can't like twice
+        const oldLike = await Like.findOne({user: req.userId})
+        if(oldLike){
+            return res.status(200).json({
+                message: "Post already liked by you"
+            })
+        }
+
+        const like = new Like({action: "like", user: req.userId})
+        comment.likes.push(like)
+        await like.save()
+        await comment.save()
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.unlikeComment = async (req, res, next) => {
+    const commentID = req.params.commentId;
+    try {
+        const comment = await Comment.findById(commentID)
+        notInDB(comment, "Comment")
+
+        const oldLike = await Like.findOne({user: req.userId})
+        if(!oldLike){
+            return res.status(200).json({
+                message: "Success, Was Never liked btw"
+            })
+        }
+        comment.likes.pull(oldLike)
+        await comment.save()
+        
     } catch (error) {
         next(error)
     }
