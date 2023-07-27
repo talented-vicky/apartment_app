@@ -61,7 +61,7 @@ app.use((err, req, res, next) => {
     res.status(status).json({message: msg, data: data})
 })
 
-
+// call socket io here
 connectDB()
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
 

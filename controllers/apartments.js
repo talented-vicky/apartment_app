@@ -46,6 +46,7 @@ exports.fetchApartments = async (req, res, next) => {
 exports.fetchApartment = async (req, res, next) => {
     const apartID = req.params.apartId
     try {
+        // const apart = await Apartment.findById(apartID)
         const apart = await Apartment.findById(apartID)
         notInDB(apart, "Apartment")
         res.status(200).json({message: "Successfully Fetched Apartment", data: apart})
@@ -64,11 +65,12 @@ exports.createApartment = async (req, res, next) => {
 
     const { name, description, location, categories, rooms, lowestPrice, highestPrice } = req.body
     const image = req.file.path
-    const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice })
+    const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice, owner: req.userId})
+    // const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice, owner: "64c12be5773c0bd238534cc4"})
     
     try {
         const user = await User.findById(req.userId)
-        // const user = await User.findById("64bee4a8a59769b0633fd6c4")
+        // const user = await User.findById("64c12be5773c0bd238534cc4")
         apartment.user = user._id
         user.apartments.push(apartment)
 
@@ -209,6 +211,22 @@ exports.removeComment = async (req, res, next) => {
         
         await Comment.findByIdAndRemove(commentID)
         res.status(200).json({message: "Successfully Deleted Comment"})
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getLikes = async (req, res, next) => {
+    const commentID = req.params.commentId;
+    try {
+        const comment = await Comment.findById(commentID)
+        notInDB(comment, "Comment")
+
+        const likes = comment.likes
+        res.status(200).json({
+            message: "Successfully fetched all likes",
+            data: likes
+        })
     } catch (error) {
         next(error)
     }

@@ -20,7 +20,9 @@ router.put('/user/signup', [
             if(existingUser){
                 return Promise.reject("A user with this email already exists")
             }
-        }).normalizeEmail(),
+        }).normalizeEmail({
+            gmail_remove_dots: false
+        }),
     body('password').trim().isLength({min: 9})
         .withMessage("Password should be at least 9 characters"),
     body('firstname').trim().not().isEmpty()
@@ -34,9 +36,11 @@ router.put('/user/signup', [
 
 router.post('/user/login', userCtrl.userLogin)
 
-router.post('/user/resetpassword', userCtrl.userReset)
+router.post('/user/reset-password', userCtrl.resetPassword)
 
-router.post('/user/changepassword', userCtrl.userChangePassword)
+router.get('/user/fetchtoken', userCtrl.fetchToken)
+
+router.put('/user/reset-password/form', userCtrl.passwordform)
 
 
 

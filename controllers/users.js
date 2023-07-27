@@ -11,7 +11,6 @@ const { funcSendMail } = require('../config/sendmail')
 
 const validationFunc = (request) => {
     const errors = validationResult(request)
-    console.log(errors)
     if(!errors.isEmpty()){
         const error = new Error("Validation Failed")
         error.statusCode = 422
@@ -52,8 +51,8 @@ exports.getUsers = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
     try {
-        // const user = await User.findById(req.params.userId)
-        const user = await User.findById("64bee4a8a59769b0633fd6c4")
+        const user = await User.findById(req.params.userId)
+        // const user = await User.findById("64c22a054fd269c27a6ef043")
         userDetailsFunc(user, "User Not Found")
         res.status(200).json({message: "Successfully Fetched User", data: user})
     } catch (error) {
@@ -68,10 +67,10 @@ exports.getUser = async (req, res, next) => {
 exports.userSignUp = async (req, res, next) => {
     validationFunc(req)
     
-    const { firstname, lastname, email, password, status } = req.body
+    const { firstname, lastname, email, password, status, address } = req.body
     try {
         const hashpassword = await bcrypt.hash(password, 12)
-        const user = new User({ firstname, lastname, email, password: hashpassword, status })
+        const user = new User({ firstname, lastname, email, password: hashpassword, status, address })
         const newUser = await user.save()
         res.status(201).json({message: `Successfully Signed up with email: ${newUser.email}`})
 
@@ -102,37 +101,26 @@ exports.userLogin = async (req, res, next) => {
 }
 
 
-exports.userReset = async (req, res, next) => {
-    let token;
-    crypto.randomBytes(32, (err, buff) => {
-        if(err){
-            const error = new Error("Problem generating encryption")
-            error.statusCode = 404
-            throw error
-        }
-        token = buff.toString('hex')
-    })
+
+// PASSWORD RESET
+exports.resetPassword = async (req, res, next) => {
+    const { email } = req.body
     
     try {
-        const user = await User.findOne({ email: req.body.email})
+        const user = await User.findOne({ email })
         if(!user){
             const error = new Error("Email does not exist, please sign up!")
             error.statusCode = 404
             throw error
         }
-
+        
+        // reset token and expiry date
+        const token = crypto.randomBytes(32).toString('hex')
         user.token = token
         user.tokenExp = Date.now() + 900000 // expires in 15 mins
         await user.save()
         
-        const data = await funcSendMail(user.email, '/user/passwordForm', token)
-        // data has been undefined all these while
-        console.log(data)
-        if(!data){
-            const error = new Email("Error sending email")
-            error.statusCode = 402
-            throw error
-        }
+        const data = await funcSendMail(email, '/user/fetchtoken', token)
         res.status(200).json({message: "Successfully sent email", result: data})
 
     } catch (error) {
@@ -140,37 +128,50 @@ exports.userReset = async (req, res, next) => {
     }
 }
 
-exports.userChangePassword = async (req, res, next) => {
-    const { token, password, passwordConfirm } = req.body
-    // inform frontend to add a hidden input field that fetches
-    // the token from the url that brought the user to the 
-    // password form page
-
-    if(password !== passwordConfirm){
-        const error = new Error("Passwords do not match")
-        error.statusCode = 401
-        throw error
-    }
-
+exports.fetchToken = async (req, res, next) => {
+    console.log('checking logo newyork')
+    const { token } = req.query
+    console.log('NWhere')
     try {
         const user = await User.findOne({ token, tokenExp: {$gt: Data.now()} })
         if(!user){
-            const error = new Error("Invalid token OR token already expired, note that token expiration date is 15 mins")
+            const error = new Error("Invalid token OR token already expired, note that token expiration is 15 mins")
             error.statusCode = 403
             throw error
         }
-        const hashPassword = await bcrypt.hash(password, 12)
-        user.password = hashPassword
-        user.token = undefined
-        user.tokenExp = undefined
-        const newUser = await user.save()
-        res.status(200).json({message: `Successfully reset password for user with id: ${newUser._id}`})
+        res.status(200).json({message: "stuff"})
+        // res.redirect('/ask for frontend form')
 
     } catch (error) {
         next(error)
     }
 }
 
+exports.passwordform = async (req, res, next) => {
+    const { password, confirmpass, email } = req.body
+    // tell frontend to send email of user as a hidden input
+    if(password !== confirmpass){
+        const error = new Error("Passwords do not match")
+        error.statusCode = 401
+        throw error
+    }
+
+    const user = await User.findOne({ email })
+    if(!user){
+        const error = new Error("User Not Found")
+        error.statusCode = 403
+        throw error
+    }
+
+    const hashPassword = await bcrypt.hash(password, 12)
+    user.password = hashPassword
+    user.token = undefined
+    user.tokenExp = undefined
+    const newUser = await user.save()
+    res.status(200).json({ 
+        message: `Successfully reset password for user: ${newUser.email}`
+    })
+}
 
 
 // GOOGLE LOGIN
