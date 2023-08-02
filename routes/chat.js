@@ -3,9 +3,11 @@ const router = express.Router()
 
 const chatCtrl = require('../controllers/chat')
 
-router.get('/chat', chatCtrl.getChat)
+// router.get('/chat', chatCtrl.chatHome)
+// remove this route, should be on frontend page
+// should pass emails of users
 
-router.get('/user', chatCtrl.getUser)
+router.get('/chatroom/:email', chatCtrl.Chatroom)
 
 
 module.exports = router

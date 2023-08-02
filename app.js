@@ -8,13 +8,13 @@ require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
-// const chatRoute = require('./routes/chat')
+const chatRoute = require('./routes/chat')
 
 const { PORT } = require('./config/keys')
 const { connectDB } = require('./config/db')
 const { logger } = require('./config/logger')
 const { fileStorage, filter } = require('./config/file')
-// const { socketIO } = require('./config/socket')
+const { socketCon } = require('./config/socket')
 
 const app = express()
 
@@ -31,11 +31,17 @@ app.use(bodyparser.json())
 
 app.use(multer({storage: fileStorage, fileFilter: filter}).single('image'))
 
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use('/images', express.static(path.join(__dirname, 'images')))
 // [0] all request going to /images can be served statically
 // [1][0][1] dirname gives access to app.js which is in the same 
 // directory as the images folder hence everything in it is 
 // easily accessible
+
+app.set('view engine', 'ejs')
+app.set('views', 'views')
+
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -50,7 +56,7 @@ app.use((req, res, next) => {
 
 app.use(userRoute)
 app.use(apartmentRoute)
-// app.use(chatRoute)
+app.use(chatRoute)
 
 // errors from the above middlewares (see all catch in controllers) 
 // are sent to the middleware below (error middleware)
@@ -61,11 +67,11 @@ app.use((err, req, res, next) => {
     res.status(status).json({message: msg, data: data})
 })
 
-// call socket io here
 connectDB()
+// call database, after which we call the socket io
+socketCon()
+
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
 
 
-// headers: {
-//     Authorization: 'Bearer ' + this.props.token
-// }
+// GUCHI - all over you

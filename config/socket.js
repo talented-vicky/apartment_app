@@ -9,37 +9,41 @@ const io = socket(server)
 const Chat = require('../models/chat')
 
 
-
 // chat event listener setup
-io.on("connection", async socket => {
-    console.log(`User: ${socket.id} is now connected`)
-    io.on("disconnect", () => {
-        console.log(`User: ${socket.id} disconnected`)
-    })
-
-    // typing
-    let ctUser;
-    io.on("typing", async data => {
-        io.broadcast.emit("notifyTyping", {
-            user: data.user,
-            message: data.message
+const socketCon = () => {
+    io.on("connection", async socket => {
+        console.log(`User: ${socket.id} is now connected`)
+        socket.on("disconnect", () => {
+            console.log(`User: ${socket.id} disconnected`)
         })
-        ctUser = data.user
+    
+        // typing
+        socket.on("typing", async data => {
+            socket.broadcast.emit("notifyTyping", {
+                user: data.user,
+                message: data.message
+            })
+        })
+        // stops typing
+        socket.on("stopTyping", async () => {
+            socket.broadcast.emit("notifyStopTyping")
+        })
+    
+        // chat messages
+        socket.on("chatMessage", async msg => {
+            console.log(`message: ${msg}`)
+    
+            // save message to database
+            const chatMsg = new Chat({
+                message: msg.text, 
+                sender: msg.sender
+            })
+            await chatMsg.save()
+            
+            // send message to everyone in port 5000 (chatroom)
+            io.emit("chatMessage", chatMsg)
+        })
     })
-    // stops typing
-    io.on("stopTyping", async () => {
-        io.broadcast.emit("notifyStopTyping")
-    })
+}
 
-    io.on("chat message", async msg => {
-        console.log(`message: ${msg}`)
-
-        // send message to everyone in port 5000 except self
-        io.broadcast.emit("received", { message: msg})
-
-        // call database and afterwards
-        connectDB()
-        const chatMsg = new Chat({message: msg, sender: ctUser})
-        await chatMsg.save()
-    })
-})
+module.exports = { socketCon }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>title</title>
+    <link rel="stylesheet" href="/style/chat.css">
+</head>
+<body>
+    <div class="chatbody">
+        <h1> Welcome to Chatroom <%= username %></h1>
+        <div id="chat">
+            <div id="chat-message">
+                <% if(chatHistory.length > 0) { %>
+                    <% chatHistory.forEach (msg => { %>
+                        <div class="message-container">
+                            <div class="message-body">
+                                <div class="user-id" id="user-id">
+                                    <%= msg._id %>
+                                </div>
+                                <script>
+                                    var colors = ['#d8cd30', '#ff0000', '#00ff00', '#0000ff', '#d83076']
+                                    var colorsRand = colors[Math.floor(Math.random() * colors.length)]
+                                    document.getElementById("user-id").style.color = colorsRand
+                                </script>
+                                <!-- fix bug here -->
+                                <div class="user-name"><%= msg.sender %></div>
+                            </div>
+                            <div class="user-message"><%= msg.message %></div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <h3> No chat yet </h3>
+                <% } %>
+            </div>
+            <form id="chat-form">
+                <input type="text" id="message-input" placeholder="Enter message...">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/chat.js"></script>    
+    
+
+    <script>
+        console.log("first inner")
+
+        const socket = io()
+        console.log("inner javascript")
+        // handle message submission
+        const chatform = document.getElementById('chat-form')
+        chatform.addEventListener('submit', e => {
+            e.preventDefault()
+            const msg = document.getElementById('message-input')
+
+            // send message to server
+            socket.emit('chatMessage', {
+                sender: "<%= username %>",
+                text: msg.value
+            })
+
+            // clear input field
+            document.getElementById('message-input').value = ''
+        })
+
+        // display incoming chat message
+        socket.on('chatMessage', msg => {
+            const chatMsg = document.getElementById('chat-message')
+            const msgElem = document.createElement('div')
+            msgElem.innerText = `${msg.sender}: ${msg.text}`
+            chatMsg.appendChild(msgElem)
+        })
+    </script>
+</body>
+</html>

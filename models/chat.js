@@ -7,8 +7,8 @@ const chatSchema = new Schema(
             type: String
         },
         sender: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+            type: String
+            // this should the user email
         }
     },
     {
