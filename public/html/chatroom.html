@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatroom</title>
+    <link rel="stylesheet" href="../style/chat.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+</head>
+<body>
+    <div class="chatbody">
+        <h1 id="usernameid"> Welcome to Chatroom </h1>
+        <div id="chat">
+            <div id="chat-message">
+                <!-- message body here -->
+                <div class="message-container">
+                    <div class="message-body">
+                        <div class="user-id" id="user-id">s76aQYU</div>
+                        <script>
+                            var colors = ['#d8cd30', '#ff0000', '#00ff00', '#0000ff', '#d83076']
+                            var colorsRand = colors[Math.floor(Math.random() * colors.length)]
+                            document.getElementById("user-id").style.color = colorsRand
+                        </script>
+                        <div class="user-name">vicky</div>
+                    </div>
+                    <div class="user-message">Pleased to be here people</div>
+                </div>
+            </div>
+            <form id="chat-form">
+                <input type="text" id="message-input" placeholder="Enter message...">
+                <button type="submit">Send</button>
+            </form>
+            <script>
+                document.getElementById('chat-form').addEventListener('submit', () => {
+                    console.log('here too')
+                })
+            </script>
+            <!-- <input type="text" id="message-input" placeholder="Enter message...">
+            <button id="chat-form">Send</button> -->
+            <script src="../js/chat.js"></script>
+        </div>
+    </div>
+
+
+</body>
+</html>

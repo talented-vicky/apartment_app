@@ -9,18 +9,20 @@ const io = socket(server)
 const Chat = require('../models/chat')
 
 
-// chat event listener setup
+// socket chat setup
 const socketCon = () => {
     io.on("connection", async socket => {
-        console.log(`User: ${socket.id} is now connected`)
-        socket.on("disconnect", () => {
-            console.log(`User: ${socket.id} disconnected`)
+        console.log(`User: ${socket.id} is now connected`)        
+        
+        // join group
+        socket.on("joinRoom", room => {
+            socket.join(room)
         })
-    
+        
         // typing
         socket.on("typing", async data => {
             socket.broadcast.emit("notifyTyping", {
-                user: data.user,
+                sender: data.sender,
                 message: data.message
             })
         })
@@ -28,20 +30,27 @@ const socketCon = () => {
         socket.on("stopTyping", async () => {
             socket.broadcast.emit("notifyStopTyping")
         })
-    
-        // chat messages
-        socket.on("chatMessage", async msg => {
+        
+        // New Chat messages
+        socket.on("sendMessage", async msg => {
             console.log(`message: ${msg}`)
-    
+            const {sender, message } = msg
+
             // save message to database
             const chatMsg = new Chat({
-                message: msg.text, 
-                sender: msg.sender
+                // message: message, 
+                // sender: sender,
+                message, sender, timestamp: new Date()
             })
             await chatMsg.save()
             
             // send message to everyone in port 5000 (chatroom)
-            io.emit("chatMessage", chatMsg)
+            io.emit("receiveMessage", chatMsg)
+        })
+
+        // disconnecting user
+        socket.on("disconnect", () => {
+            console.log(`User: ${socket.id} disconnected`)
         })
     })
 }

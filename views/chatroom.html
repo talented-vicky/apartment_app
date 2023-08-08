@@ -43,36 +43,5 @@
     </div>
 
     <script src="/js/chat.js"></script>    
-    
-
-    <script>
-        console.log("first inner")
-
-        const socket = io()
-        console.log("inner javascript")
-        // handle message submission
-        const chatform = document.getElementById('chat-form')
-        chatform.addEventListener('submit', e => {
-            e.preventDefault()
-            const msg = document.getElementById('message-input')
-
-            // send message to server
-            socket.emit('chatMessage', {
-                sender: "<%= username %>",
-                text: msg.value
-            })
-
-            // clear input field
-            document.getElementById('message-input').value = ''
-        })
-
-        // display incoming chat message
-        socket.on('chatMessage', msg => {
-            const chatMsg = document.getElementById('chat-message')
-            const msgElem = document.createElement('div')
-            msgElem.innerText = `${msg.sender}: ${msg.text}`
-            chatMsg.appendChild(msgElem)
-        })
-    </script>
 </body>
 </html>

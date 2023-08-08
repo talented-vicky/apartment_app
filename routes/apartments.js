@@ -7,7 +7,7 @@ const authMid = require('../middlewares/auth')
 
 
 // APARTMENTS
-router.get('/owner/apartments', authMid, apartCtrl.fetchApartments)
+router.get('/owner/apartments', apartCtrl.fetchApartments)
 
 router.get('/owner/apartment/:apartId', authMid, apartCtrl.fetchApartment)
 
@@ -22,7 +22,7 @@ router.post('/owner/apartment', [
         .withMessage('price must be numeric'),
     body('highestPrice').isNumeric()
         .withMessage('price must be numeric'),
-], authMid, apartCtrl.createApartment)
+], apartCtrl.createApartment)
 
 router.post('/owner/apartment/:apartId', [
     body('name').not().isEmpty()

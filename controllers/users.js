@@ -27,12 +27,19 @@ const userDetailsFunc = (userParam, errMsg) => {
     }
 }
 
-const emptyUserData = (userdata, errMsg) => {
-    if(userdata.length == 0){
-        return res.status(200).json({
-            message: `No ${userdata} found`,
-            data: userdata
-        })
+// USER ACTION
+exports.reportUser = async (req, res, next) => {
+    const { userId } = req.params
+    try {
+        const user = await User.findById(userId)
+        userDetailsFunc(user, "User Not Found")
+
+        user.reported += 1
+        user.save()
+        res.staus(200).json({ message: "Reported User" })
+
+    } catch (error) {
+        next(error)
     }
 }
 
@@ -41,8 +48,10 @@ exports.getUsers = async (req, res, next) => {
     try {
         const users = await User.find()
         userDetailsFunc(users, "Users Not Found")
-        emptyUserData(users, "Users Not Found")
-        res.status(200).json({message: "Successfully Fetched Users", data: users})
+        res.status(200).json({
+            message: "Successfully Fetched Users", 
+            data: users
+        })
     } catch (error) {
         next(error)
     }

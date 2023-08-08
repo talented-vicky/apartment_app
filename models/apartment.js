@@ -14,13 +14,13 @@ const apartmentSchema = new Schema({
         type: String,
         required: true
     },
+    postCode: {
+        type: String,
+        required: true
+    },
     location: {
         type: String,
         required: true,
-    },
-    categories: {
-        type: String,
-        required: true
     },
     rooms: {
         type: Number,
@@ -33,6 +33,13 @@ const apartmentSchema = new Schema({
     highestPrice: {
         type: Number,
         required: true
+    },
+    categories: [
+        String
+    ],
+    isVerified: {
+        type: Boolean,
+        default: false
     },
     comments: [
         {

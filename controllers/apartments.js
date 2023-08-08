@@ -1,9 +1,18 @@
 const { validationResult } = require('express-validator')
+const cloudinary = require('cloudinary').v2
 
 const Apartment = require('../models/apartment')
 const User = require('../models/user')
 const Comment = require('../models/comment')
 const Like = require('../models/like')
+
+const { cloudinary_api_key, cloudinary_api_secret, cloudinary_name } = require('../config/keys')
+
+cloudinary.config({
+    cloud_name: cloudinary_name,
+    api_key: cloudinary_api_key,
+    api_secret: cloudinary_api_secret
+})
 
 const validateFunc = (request) => {
     const errors = validationResult(request)
@@ -22,20 +31,11 @@ const notInDB = (constant, name) => {
     }
 }
 
-const emptyData = (data, constant) => {
-    if(data.length == 0){
-        return res.status(200).json({
-            message: `No ${constant} found`,
-            data: data
-        })
-    }
-}
-
 exports.fetchApartments = async (req, res, next) => {
     try {
         const aparts = await Apartment.find()
         notInDB(aparts, "Apartments")
-        emptyData(aparts, "Apartments")
+
         res.status(200).json({message: "Successfully Fetched Apartments", data: aparts})
         
     } catch (error) {
@@ -46,9 +46,10 @@ exports.fetchApartments = async (req, res, next) => {
 exports.fetchApartment = async (req, res, next) => {
     const apartID = req.params.apartId
     try {
-        // const apart = await Apartment.findById(apartID)
         const apart = await Apartment.findById(apartID)
+        // const apart = await Apartment.findById(apartID)
         notInDB(apart, "Apartment")
+
         res.status(200).json({message: "Successfully Fetched Apartment", data: apart})
     } catch (error) {
         next(error)
@@ -63,14 +64,27 @@ exports.createApartment = async (req, res, next) => {
         throw error
     }
 
-    const { name, description, location, categories, rooms, lowestPrice, highestPrice } = req.body
-    const image = req.file.path
-    const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice, owner: req.userId})
-    // const apartment = new Apartment({ name, description, image, location, categories, rooms, lowestPrice, highestPrice, owner: "64c12be5773c0bd238534cc4"})
+    const { name, description, location, postCode, categories, rooms, lowestPrice, highestPrice } = req.body
+    let image
+    const initImage = req.file.path
     
     try {
-        const user = await User.findById(req.userId)
-        // const user = await User.findById("64c12be5773c0bd238534cc4")
+        await cloudinary.uploader.upload(
+            initImage,
+            async (err, result) => {
+                if(err){
+                    const error = new Error("Error Uploading image to cloudinary")
+                    error.statusCode = 402
+                    throw error
+                }
+                image = result.secure_url
+            }
+        )
+        // const apartment = new Apartment({ name, description, image, postCode, location, rooms, lowestPrice, highestPrice, owner: req.userId})
+        const apartment = new Apartment({ name, description, image, location, postCode, categories, rooms, lowestPrice, highestPrice, owner: "64d0e4f561527ea6fece8c67"})
+
+        // const user = await User.findById(req.userId)
+        const user = await User.findById("64d0e4f561527ea6fece8c67")
         apartment.user = user._id
         user.apartments.push(apartment)
 
@@ -82,11 +96,9 @@ exports.createApartment = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
-    // location and type should be the class name for the 
-    // select container for all their options
 }
 
-
+// fix this
 exports.updateApartment = async (req, res, next) => {
     validateFunc(req);
     let image;
@@ -143,7 +155,7 @@ exports.fetchComments = async (req, res, next) => {
     try {
         const comment = await Comment.find()
         notInDB(comment, "Comments")
-        emptyData(comment, "Comments")
+
         res.status(200).json({message: "Successfully Fetched Comments", data: comment})
     
     } catch (error) {
@@ -166,12 +178,12 @@ exports.addComment = async (req, res, next) => {
     validateFunc(req);
     const { content } = req.body;
     const comment = new Comment({ content, user: req.userId });
-    // const comment = new Comment({ content, user: "64b5092e6e898ce12f9198f5" });
+    // const comment = new Comment({ content, user: "64d0e4f561527ea6fece8c67" });
     
     const apartID = req.params.apartId;
     try {
         apart = await Apartment.findById(apartID)
-        // apart = await Apartment.findById("64bbfcf3af49850083a4f0d3")
+        // apart = await Apartment.findById("64d18ce6899e1b972993b574")
         notInDB(apart, "Apartment")
 
         apart.comments.push(comment)

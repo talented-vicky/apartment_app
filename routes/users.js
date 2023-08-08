@@ -5,6 +5,8 @@ const { body } = require('express-validator')
 const userCtrl = require('../controllers/users')
 const User = require('../models/user')
 
+// USER ACTION
+router.put('/user/:userId', userCtrl.reportUser)
 
 // USERS DETAILS
 router.get('/users', userCtrl.getUsers)

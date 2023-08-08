@@ -8,15 +8,25 @@ require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
-const chatRoute = require('./routes/chat')
+const authRoute = require('./routes/admin')
 
 const { PORT } = require('./config/keys')
 const { connectDB } = require('./config/db')
 const { logger } = require('./config/logger')
-const { fileStorage, filter } = require('./config/file')
-const { socketCon } = require('./config/socket')
+
+// const { socketCon } = require('./config/socket')
+// const Chat = require("./models/chat")
+
+// // first
+// const socket = require('socket.io')
+// const http = require('http')
 
 const app = express()
+
+// // second
+// const server = http.createServer(app)
+// const io = socket(server)
+
 
 app.use(ckSession({
     name: 'google-auth-session',
@@ -29,9 +39,9 @@ app.use(passport.session())
 app.use(bodyparser.json())
 // helps server understand all client json data
 
-app.use(multer({storage: fileStorage, fileFilter: filter}).single('image'))
+app.use(multer({dest: 'uploads/'}).single('image'))
 
-app.use(express.static(path.join(__dirname, 'public')))
+// app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 // [0] all request going to /images can be served statically
@@ -39,8 +49,8 @@ app.use('/images', express.static(path.join(__dirname, 'images')))
 // directory as the images folder hence everything in it is 
 // easily accessible
 
-app.set('view engine', 'ejs')
-app.set('views', 'views')
+// app.set('view engine', 'ejs')
+// app.set('views', 'views')
 
 
 app.use((req, res, next) => {
@@ -50,13 +60,13 @@ app.use((req, res, next) => {
     next()
 })
 
-// app.get('/', (req, res) => {
-//     res.status(200).json({message: "Welcome to the backend"})
-// })
+app.get('/', (req, res) => {
+    res.status(200).json({message: "Welcome to the backend"})
+})
 
 app.use(userRoute)
 app.use(apartmentRoute)
-app.use(chatRoute)
+app.use(authRoute)
 
 // errors from the above middlewares (see all catch in controllers) 
 // are sent to the middleware below (error middleware)
@@ -69,9 +79,13 @@ app.use((err, req, res, next) => {
 
 connectDB()
 // call database, after which we call the socket io
-socketCon()
+// socketCon()
 
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
 
 
 // GUCHI - all over you
+
+
+
+

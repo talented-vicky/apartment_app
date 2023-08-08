@@ -38,9 +38,9 @@ passport.use(
                     name: profile.displayName
                 }
             })
-            // find fix to allow new owners sign up with google
             await newUser.save()
             return done(null, profile)
+            
         } catch (error) {
             return done(error, false)
         }

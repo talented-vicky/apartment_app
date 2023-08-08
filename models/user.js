@@ -39,6 +39,14 @@ const userSchema = new Schema(
             type: String,
             required: true
         },
+        reported: {
+            type: Number,
+            default: 0
+        },
+        activated: {
+            type: Boolean,
+            default: true
+        },
         apartments: [
             {
                 type: Schema.Types.ObjectId,
