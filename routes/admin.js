@@ -6,6 +6,16 @@ const adminCtrl = require('../controllers/admin')
 const Admin = require('../models/admin')
 
 
+// ADDRESSES
+router.put('/admin/location', adminCtrl.addAddress)
+
+router.get('/admin/locations', adminCtrl.getAddresses)
+
+router.put('/admin/postcode', adminCtrl.addPostcode)
+
+router.get('/admin/postcodes', adminCtrl.getPostcodes)
+
+
 // only accessible by backender =>
 // SIGN UP (ONLY ACCESSIBLE BY BACKENDER) AND LOG IN
 router.put('/admin/signup', [

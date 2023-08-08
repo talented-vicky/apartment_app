@@ -9,24 +9,13 @@ require('./config/googleAuth')
 const userRoute = require('./routes/users')
 const apartmentRoute = require('./routes/apartments')
 const authRoute = require('./routes/admin')
+const chatRoute = require('./routes/chat')
 
 const { PORT } = require('./config/keys')
 const { connectDB } = require('./config/db')
 const { logger } = require('./config/logger')
 
-// const { socketCon } = require('./config/socket')
-// const Chat = require("./models/chat")
-
-// // first
-// const socket = require('socket.io')
-// const http = require('http')
-
 const app = express()
-
-// // second
-// const server = http.createServer(app)
-// const io = socket(server)
-
 
 app.use(ckSession({
     name: 'google-auth-session',
@@ -41,16 +30,7 @@ app.use(bodyparser.json())
 
 app.use(multer({dest: 'uploads/'}).single('image'))
 
-// app.use(express.static(path.join(__dirname, 'public')))
-
 app.use('/images', express.static(path.join(__dirname, 'images')))
-// [0] all request going to /images can be served statically
-// [1][0][1] dirname gives access to app.js which is in the same 
-// directory as the images folder hence everything in it is 
-// easily accessible
-
-// app.set('view engine', 'ejs')
-// app.set('views', 'views')
 
 
 app.use((req, res, next) => {
@@ -67,6 +47,7 @@ app.get('/', (req, res) => {
 app.use(userRoute)
 app.use(apartmentRoute)
 app.use(authRoute)
+app.use(chatRoute)
 
 // errors from the above middlewares (see all catch in controllers) 
 // are sent to the middleware below (error middleware)
@@ -78,8 +59,6 @@ app.use((err, req, res, next) => {
 })
 
 connectDB()
-// call database, after which we call the socket io
-// socketCon()
 
 app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`))
 

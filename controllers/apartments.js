@@ -31,6 +31,7 @@ const notInDB = (constant, name) => {
     }
 }
 
+// APARTMENTS
 exports.fetchApartments = async (req, res, next) => {
     try {
         const aparts = await Apartment.find()
@@ -98,6 +99,7 @@ exports.createApartment = async (req, res, next) => {
     }
 }
 
+// URGENT URGENT URGENT *******
 // fix this
 exports.updateApartment = async (req, res, next) => {
     validateFunc(req);

@@ -7,6 +7,8 @@ const { json_secret } = require('../config/keys')
 const User = require('../models/user')
 const Apartment = require('../models/apartment')
 const Admin = require('../models/admin')
+const Address = require('../models/address')
+const Postcode = require('../models/postcode')
 
 const findData = (data, errMsg) => {
     if(!data){
@@ -15,6 +17,67 @@ const findData = (data, errMsg) => {
         throw error
     }    
 }
+
+// ADDRESSES
+exports.addAddress = async (req, res, next) => {
+    const { location } = req.body
+    try {
+        const address = new Address({ location })
+        address.save()
+
+        res.status(200).json({
+            message: "Successfully Added Location",
+            data: address
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getAddresses = async (req, res, next) => {
+    try {
+        const addresses = await Address.find()
+        findData(addresses, "No Location Found")
+
+        res.status(200).json({
+            message: "Successfully Fetched Locations",
+            data: addresses
+        })
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.addPostcode = async (req, res, next) => {
+    const { postcode } = req.body
+    try {
+        const pcode = new Postcode({ postcode })
+        pcode.save()
+
+        res.status(200).json({
+            message: "Successfully Added PostCode",
+            data: pcode
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getPostcodes = async (req, res, next) => {
+    try {
+        const postcodes = await Postcode.find()
+        findData(postcodes, "No PostCode Found")
+
+        res.status(200).json({
+            message: "Successfully Fetched PostCodes",
+            data: postcodes
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 // hardcode admin sign up 
 // This should only be accessible by bakcend dev

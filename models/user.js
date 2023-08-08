@@ -47,6 +47,12 @@ const userSchema = new Schema(
             type: Boolean,
             default: true
         },
+        messages: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Chat'
+            }
+        ],
         apartments: [
             {
                 type: Schema.Types.ObjectId,
