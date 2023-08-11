@@ -82,10 +82,10 @@ exports.createApartment = async (req, res, next) => {
             }
         )
         const apartment = new Apartment({ name, description, image, postCode, categories, location, rooms, lowestPrice, highestPrice, owner: req.userId})
-        // const apartment = new Apartment({ name, description, image, location, postCode, categories, rooms, lowestPrice, highestPrice, owner: "64d0e4f561527ea6fece8c67"})
+        // const apartment = new Apartment({ name, description, image, location, postCode, categories, rooms, lowestPrice, highestPrice, owner: "64d596c41965fbfd4b382918"})
 
         const user = await User.findById(req.userId)
-        // const user = await User.findById("64d0e4f561527ea6fece8c67")
+        // const user = await User.findById("64d596c41965fbfd4b382918")
         apartment.user = user._id
         user.apartments.push(apartment)
 
