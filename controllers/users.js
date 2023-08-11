@@ -9,15 +9,6 @@ const User = require('../models/user')
 const { json_secret } = require('../config/keys')
 const { funcSendMail } = require('../config/sendmail')
 
-const validationFunc = (request) => {
-    const errors = validationResult(request)
-    if(!errors.isEmpty()){
-        const error = new Error("Validation Failed")
-        error.statusCode = 422
-        error.data = errors.array()[0]
-        throw error
-    }
-}
 
 const userDetailsFunc = (userParam, errMsg) => {
     if(!userParam){
@@ -74,8 +65,14 @@ exports.getUser = async (req, res, next) => {
 
 // USERS SIGNUP & LOGIN
 exports.userSignUp = async (req, res, next) => {
-    validationFunc(req)
-    
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        const error = new Error("Validation Failed")
+        error.statusCode = 422
+        error.data = errors.array()[0]
+        throw error
+    }
+
     const { firstname, lastname, email, password, status, address } = req.body
     try {
         const hashpassword = await bcrypt.hash(password, 12)
@@ -126,46 +123,38 @@ exports.resetPassword = async (req, res, next) => {
         // reset token and expiry date
         const token = crypto.randomBytes(32).toString('hex')
         user.token = token
-        user.tokenExp = Date.now() + 900000 // expires in 15 mins
+        user.tokenExp = Date.now() + 3600000 // expires in 1 hr
         await user.save()
         
-        const data = await funcSendMail(email, '/user/fetchtoken', token)
-        res.status(200).json({message: "Successfully sent email", result: data})
+        await funcSendMail(email, 'user/email-redirect', token)
+        res.status(200).json({message: "Successfully sent email"})
 
     } catch (error) {
         next(error)
     }
 }
 
-exports.fetchToken = async (req, res, next) => {
-    console.log('checking logo newyork')
-    const { token } = req.query
-    console.log('NWhere')
-    try {
-        const user = await User.findOne({ token, tokenExp: {$gt: Data.now()} })
-        if(!user){
-            const error = new Error("Invalid token OR token already expired, note that token expiration is 15 mins")
-            error.statusCode = 403
-            throw error
-        }
-        res.status(200).json({message: "stuff"})
-        // res.redirect('/ask for frontend form')
+// exports.emailRedirect = async (req, res, next) => {    
+//     const user = await User.findOne({ token: req.query.token, tokenExp: {$gt: Data.now()} })
+//     if(!user){
+//         const error = new Error("Invalid token OR token already expired, note that token expiration is 15 mins")
+//         error.statusCode = 403
+//         throw error
+//     }
+//     res.status(200).json({message: "Success"})
+// }
 
-    } catch (error) {
-        next(error)
-    }
-}
+exports.newPassword = async (req, res, next) => {
+    const { password, confirmpass } = req.body
 
-exports.passwordform = async (req, res, next) => {
-    const { password, confirmpass, email } = req.body
-    // tell frontend to send email of user as a hidden input
     if(password !== confirmpass){
         const error = new Error("Passwords do not match")
         error.statusCode = 401
         throw error
     }
 
-    const user = await User.findOne({ email })
+    const user = await User.findById(req.userId)
+    // const user = await User.findOne({ email })
     if(!user){
         const error = new Error("User Not Found")
         error.statusCode = 403

@@ -15,7 +15,7 @@ router.get('/user/:userId', userCtrl.getUser)
 
 
 // USERS SIGNUP & LOGIN
-router.put('/user/signup', [
+router.post('/user/signup', [
     body('email').isEmail().withMessage('Invalid email')
         .custom(async (notValid, { req }) => {
             const existingUser = await User.findOne({email: notValid})
@@ -35,14 +35,14 @@ router.put('/user/signup', [
     userCtrl.userSignUp
 )
 
-
 router.post('/user/login', userCtrl.userLogin)
 
+
+// PASSWORD RESET
 router.post('/user/reset-password', userCtrl.resetPassword)
 
-router.get('/user/fetchtoken', userCtrl.fetchToken)
-
-router.put('/user/reset-password/form', userCtrl.passwordform)
+// router.get('/user/email-redirect/?token', userCtrl.emailRedirect)
+router.put('/user/new-password', userCtrl.newPassword)
 
 
 

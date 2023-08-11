@@ -4,6 +4,8 @@ const multer = require("multer")
 const path = require('path')
 const passport = require('passport')
 const ckSession = require('cookie-session')
+
+
 require('./config/googleAuth')
 
 const userRoute = require('./routes/users')
@@ -64,7 +66,4 @@ app.listen(PORT, "0.0.0.0", () => logger.info(`Connection live on port: ${PORT}`
 
 
 // GUCHI - all over you
-
-
-
 

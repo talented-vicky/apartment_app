@@ -4,7 +4,7 @@ const { sendgrid_api_key } = require('./keys')
 
 const funcSendMail = async (userEmail, url, token) => {
     sgMail.setApiKey(sendgrid_api_key)
-    const redirectUrl = `http://localhost:5000/${url}?token=${token}`
+    const redirectUrl = `http://localhost:5000/${url}/?token=${token}`
     const msg = {
         to: userEmail,
         from: 'victorotubure7@gmail.com',
