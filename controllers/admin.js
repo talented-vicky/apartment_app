@@ -151,10 +151,11 @@ exports.verifyApartment = async (req, res, next) => {
     const { apartId } = req.params
     try {
         const apartment = await Apartment.findById(apartId)
+        // const apartment = await Apartment.findById("64d6c91d78f68b064e1d9599")
         findData(apartment, "Apartment Not Found")
 
         apartment.isVerified = true
-        user.save()
+        apartment.save()
         res.status(200).json({message: "User now verified"})
 
     } catch (error) {

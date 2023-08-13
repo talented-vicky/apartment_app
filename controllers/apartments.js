@@ -48,7 +48,7 @@ exports.fetchApartment = async (req, res, next) => {
     const apartID = req.params.apartId
     try {
         const apart = await Apartment.findById(apartID)
-        // const apart = await Apartment.findById(apartID)
+        // const apart = await Apartment.findById("64d6c91d78f68b064e1d9599")
         notInDB(apart, "Apartment")
 
         res.status(200).json({message: "Successfully Fetched Apartment", data: apart})

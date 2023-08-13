@@ -10,9 +10,9 @@ const authMid = require('../middlewares/auth')
 router.put('/user/:userId', authMid, userCtrl.reportUser)
 
 // USERS DETAILS
-router.get('/users', userCtrl.getUsers)
+router.get('/users', authMid, userCtrl.getUsers)
 
-router.get('/user/:userId', userCtrl.getUser)
+router.get('/user/:userId', authMid, userCtrl.getUser)
 
 
 // USERS SIGNUP & LOGIN

@@ -4,14 +4,13 @@ const router = express.Router()
 const chatCtrl = require('../controllers/chat')
 const authMid = require('../middlewares/auth')
 
-router.put('/chat/:receiverId', chatCtrl.sendChat)
 
-router.get('/chats/sent', chatCtrl.loadSentChats)
+router.put('/chat/:receiverId', authMid, chatCtrl.sendChat)
 
-router.get('/chats/received', chatCtrl.loadReceivedChats)
+router.get('/chats/sent', authMid, chatCtrl.loadSentChats)
 
-router.get('/chats', chatCtrl.loadChats)
+router.get('/chats/received', authMid, chatCtrl.loadReceivedChats)
 
-
+router.get('/chats', authMid, chatCtrl.loadChats)
 
 module.exports = router

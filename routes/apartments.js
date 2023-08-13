@@ -7,7 +7,7 @@ const authMid = require('../middlewares/auth')
 
 
 // APARTMENTS
-router.get('/owner/apartments', apartCtrl.fetchApartments)
+router.get('/owner/apartments', authMid, apartCtrl.fetchApartments)
 
 router.get('/owner/apartment/:apartId', authMid, apartCtrl.fetchApartment)
 
