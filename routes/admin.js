@@ -4,16 +4,17 @@ const { body } = require('express-validator')
 
 const adminCtrl = require('../controllers/admin')
 const Admin = require('../models/admin')
+const authMid = require('../middlewares/auth')
 
 
 // ADDRESSES
-router.put('/admin/location', adminCtrl.addAddress)
+router.put('/admin/location', authMid, adminCtrl.addAddress)
 
-router.get('/admin/locations', adminCtrl.getAddresses)
+router.get('/admin/locations', authMid, adminCtrl.getAddresses)
 
-router.put('/admin/postcode', adminCtrl.addPostcode)
+router.put('/admin/postcode', authMid, adminCtrl.addPostcode)
 
-router.get('/admin/postcodes', adminCtrl.getPostcodes)
+router.get('/admin/postcodes', authMid, adminCtrl.getPostcodes)
 
 
 // only accessible by backender =>
@@ -39,11 +40,11 @@ router.post('/admin/login', adminCtrl.adminLogin)
 
 
 // OPERATIONS
-router.put('/admin/user/:userId', adminCtrl.deactivateUser)
+router.put('/admin/user/:userId', authMid, adminCtrl.deactivateUser)
 
-router.put('/admin/apartment/:apartId', adminCtrl.verifyApartment)
+router.put('/admin/apartment/:apartId', authMid, adminCtrl.verifyApartment)
 
-router.delete('/admin/user/:userId', adminCtrl.deleteUser)
+router.delete('/admin/user/:userId', authMid, adminCtrl.deleteUser)
 
 module.exports = router
 

@@ -22,7 +22,7 @@ router.post('/owner/apartment', [
         .withMessage('price must be numeric'),
     body('highestPrice').isNumeric()
         .withMessage('price must be numeric'),
-], apartCtrl.createApartment)
+], authMid, apartCtrl.createApartment)
 
 router.post('/owner/apartment/:apartId', [
     body('name').not().isEmpty()
@@ -42,28 +42,28 @@ router.delete('/owner/apartment/:apartId', authMid, apartCtrl.deleteApartment)
 
 
 // COMMENTS
-router.get('/apartment/comments', apartCtrl.fetchComments)
+router.get('/apartment/comments', authMid, apartCtrl.fetchComments)
 
-router.get('/apartment/comment/:commentId', apartCtrl.fetchComment)
+router.get('/apartment/comment/:commentId', authMid, apartCtrl.fetchComment)
 
 router.put('/apartment/comment/:apartId', [
     body('content').not().isEmpty()
         .withMessage("Comment cannot be blank")
-], apartCtrl.addComment)
+], authMid, apartCtrl.addComment)
 
 router.post('/apartment/comment/:commentId', [
     body('content').not().isEmpty()
         .withMessage("Comment cannnot be blank")
-], apartCtrl.editComment)
+], authMid, apartCtrl.editComment)
 
-router.delete('/apartment/comment/:commentId', apartCtrl.removeComment)
+router.delete('/apartment/comment/:commentId', authMid, apartCtrl.removeComment)
 
 
 
 // LIKES
-router.get('/comment/like/:commentId', apartCtrl.likeComment)
+router.get('/comment/like/:commentId', authMid, apartCtrl.likeComment)
 
-router.get('/comment/unilike:commentId', apartCtrl.unlikeComment)
+router.get('/comment/unilike:commentId', authMid, apartCtrl.unlikeComment)
 
 
 

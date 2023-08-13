@@ -4,9 +4,10 @@ const { body } = require('express-validator')
 
 const userCtrl = require('../controllers/users')
 const User = require('../models/user')
+const authMid = require('../middlewares/auth')
 
 // USER ACTION
-router.put('/user/:userId', userCtrl.reportUser)
+router.put('/user/:userId', authMid, userCtrl.reportUser)
 
 // USERS DETAILS
 router.get('/users', userCtrl.getUsers)
@@ -39,10 +40,10 @@ router.post('/user/login', userCtrl.userLogin)
 
 
 // PASSWORD RESET
-router.post('/user/reset-password', userCtrl.resetPassword)
+router.post('/user/reset-password', authMid, userCtrl.resetPassword)
 
 // router.get('/user/email-redirect/?token', userCtrl.emailRedirect)
-router.put('/user/new-password', userCtrl.newPassword)
+router.put('/user/new-password', authMid, userCtrl.newPassword)
 
 
 
