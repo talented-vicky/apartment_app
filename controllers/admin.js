@@ -20,15 +20,18 @@ const findData = (data, errMsg) => {
 
 // ADDRESSES
 exports.addAddress = async (req, res, next) => {
+    // fetch data from user in the frontend and save it in address model
     const { location } = req.body
     try {
         const address = new Address({ location })
         address.save()
 
+        // send success message if successful
         res.status(200).json({
             message: "Successfully Added Location",
             data: address
         })
+        // throw error if not successful
     } catch (error) {
         next(error)
     }
@@ -50,25 +53,31 @@ exports.getAddresses = async (req, res, next) => {
 }
 
 exports.addPostcode = async (req, res, next) => {
+    // fetch data from user in the frontend & save it in postcode model
     const { postcode } = req.body
     try {
         const pcode = new Postcode({ postcode })
         pcode.save()
 
+        // send success message if successful
         res.status(200).json({
             message: "Successfully Added PostCode",
             data: pcode
         })
+        // return error if not successful
     } catch (error) {
         next(error)
     }
 }
 
 exports.getPostcodes = async (req, res, next) => {
+    // check database for all postcodes using the find() method
     try {
         const postcodes = await Postcode.find()
+        // return error if request fails
         findData(postcodes, "No PostCode Found")
-
+        
+        // send success message if successful
         res.status(200).json({
             message: "Successfully Fetched PostCodes",
             data: postcodes
@@ -82,6 +91,8 @@ exports.getPostcodes = async (req, res, next) => {
 // hardcode admin sign up 
 // This should only be accessible by bakcend dev
 exports.adminSignUp = async (req, res, next) => {
+    // check for validation of input fields from user when sigining up
+    // throw error if any input value fails validation
     const errors = validationResult(req)
     if(!errors.isEmpty()){
         const error = new Error("Validation Failed")
@@ -90,6 +101,7 @@ exports.adminSignUp = async (req, res, next) => {
         throw error
     }
     
+    // fetch all input values from the user
     const { fullname, email, password } = req.body
     try {
         const hashpassword = await bcrypt.hash(password, 12)
@@ -105,20 +117,27 @@ exports.adminSignUp = async (req, res, next) => {
 
 
 exports.adminLogin = async (req, res, next) => {
+    // fetch all user input values from body of the website
     const { email, password } = req.body
 
     try {
+        // check adming data ase if this email exists
         const myAdmin = await Admin.findOne({ email })
+        // throw error if it's non-existent
         findData(myAdmin, "Email does not match admin email!")
 
+        // compare password if of existing admin and new attempt  
         const okPassword = await bcrypt.compare(password, myAdmin.password)
+        // return error if passwords don't match
         findData(okPassword, "Incorrect Password")
 
+        // sign password with jwt for safe usage
         const token = jwt.sign(
             {email: myAdmin.email, adminId: myAdmin._id.toString()},
             json_secret, {expiresIn: '1h'}) // signed in for 1 hour
         res.status(200).json({token: token, adminId: myAdmin._id.toString()})
 
+        // throw error if any
     } catch (error) {
         next(error)
     }
@@ -133,13 +152,18 @@ exports.adminLogin = async (req, res, next) => {
 // when value exceeds 3
 
 exports.deactivateUser = async (req, res, next) => {
+    // fetch userid from params in frontend url
     const { userId } = req.params
     try {
+        // check user database for existence of user with this id
         const user = await User.findById(userId)
+        // throw error if non
         findData(user, "User Not Found")
 
+        // deactivate user and update user model in the database
         user.activated = false
         user.save()
+        // send success message upon deactivation completion 
         res.status(200).json({ message: "Successfully Deactivated User"})
     
     } catch (error) {
@@ -164,12 +188,16 @@ exports.verifyApartment = async (req, res, next) => {
 }
 
 exports.deleteUser = async (req, res, next) => {
+    // check url link with userId
     const { userId } = req.params
     try {
+        // find user with the fetched id and throw error if process fails
         const user = await User.findById(userId)
         findData(user, "User Not Found")
 
+        // if user is found, delete user from database
         await User.findByIdAndRemove(userId)
+        // send success message upon completion
         res.status(200).json({ 
             message: "Successfully Deleted User",
             data: user

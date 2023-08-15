@@ -6,14 +6,17 @@ const adminCtrl = require('../controllers/admin')
 const Admin = require('../models/admin')
 const authMid = require('../middlewares/auth')
 
+// everything here is the endpoint as will be required by the frontend
 
 // ADDRESSES
+// this will translate to http://localhost:5000/admin/location
 router.put('/admin/location', authMid, adminCtrl.addAddress)
 
 router.get('/admin/locations', authMid, adminCtrl.getAddresses)
 
 router.put('/admin/postcode', authMid, adminCtrl.addPostcode)
 
+// this will also translate to http://localhost:5000/admin/postcodes
 router.get('/admin/postcodes', authMid, adminCtrl.getPostcodes)
 
 

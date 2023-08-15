@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+// storage of all keys to be used in the application 
 module.exports = {
     PORT: process.env.port || 5000,
     mongoDB_URL: process.env.mongoDB_URL,

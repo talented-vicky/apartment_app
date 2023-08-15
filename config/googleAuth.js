@@ -26,6 +26,7 @@ passport.use(
     // authenticated
     async (request, accessToken, refreshToken, profile, done) => {
         try {
+            // find user, check for existence and save new input credentials
             let oldUser = await User.findOne({ 'google.id': profile.id })
             if(oldUser){
                 return done(null, oldUser)
@@ -47,7 +48,7 @@ passport.use(
     }
 ))
 
-// to configure passport to use jwt auth strategy
+// to configure passport to use jwt (json web token) authentication strategy
 passport.use(
     new jwtStrategy(
         {

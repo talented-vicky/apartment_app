@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { mongoDB_URL} = require('./keys');
 const { logger } = require('./logger');
 
+// connecting to the mongodb database
 const connectDB = () => {
     mongoose.connect(mongoDB_URL);
     const mongdb = mongoose.connection;

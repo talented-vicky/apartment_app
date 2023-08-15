@@ -3,6 +3,7 @@ const { combine, timestamp, label, printf } = format
 
 const defFormat = printf(({ level, label, message, timestamp }) => `${timestamp} [${level}] ${label} ${message}`)
 
+// setting up logger for connectin status, time and info
 const enumErrFormat = format((info) => {
     if(info instanceof Error){
         Object.assign(info, { message: info.stack })
